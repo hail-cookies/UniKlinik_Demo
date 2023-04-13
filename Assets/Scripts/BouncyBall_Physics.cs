@@ -34,7 +34,7 @@ public class RBVertex
     }
 }
 
-public class BouncyBall : MonoBehaviour
+public class BouncyBall_Physics : MonoBehaviour
 {
     public Transform core;
     public Rigidbody centerRb;
