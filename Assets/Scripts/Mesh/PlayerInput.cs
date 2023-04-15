@@ -5,8 +5,9 @@ using UnityEngine.InputSystem;
 public class PlayerInput : MonoBehaviour
 {
     public float deformationForce = 10;
-    public float deformationOffset = 0.1f;
-    public InputActionReference mouseLeft, mousePosition;
+    public float deformationRadius = 0.6f;
+    public InputActionReference mouseLeft;
+    public Transform cam;
 
     // Start is called before the first frame update
     void Start()
@@ -14,15 +15,6 @@ public class PlayerInput : MonoBehaviour
         mouseLeft.action.Enable();
         mouseLeft.action.performed += MouseLeft;
         mouseLeft.action.canceled += MouseLeft;
-
-        mousePosition.action.Enable();
-        mousePosition.action.performed += MousePosition;
-    }
-
-    public Vector2 screenPos = new Vector2();
-    private void MousePosition(InputAction.CallbackContext obj)
-    {
-        screenPos = obj.ReadValue<Vector2>();
     }
 
     bool mouseDown = false;
@@ -31,20 +23,23 @@ public class PlayerInput : MonoBehaviour
         mouseDown = !mouseDown;
     }
 
+    public Rigidbody touch;
     // Update is called once per frame
     void Update()
     {
         if(mouseDown )
         {
-            Ray inputRay = Camera.main.ScreenPointToRay(screenPos);
+            Ray inputRay = new Ray(cam.position, cam.forward);
             if (Physics.Raycast(inputRay, out var hit))
             {
                 var deformer = hit.collider.GetComponent<MeshDeformer>();
                 if (deformer != null)
                     deformer.ApplyForce(
-                        hit.point + hit.normal * deformationOffset, 
+                        hit.point + hit.normal * deformationRadius, 
                         deformationForce,
                         Time.deltaTime);
+                touch.position = hit.point;
+                touch.transform.localScale = Vector3.one * deformationRadius;
             }
         }
     }

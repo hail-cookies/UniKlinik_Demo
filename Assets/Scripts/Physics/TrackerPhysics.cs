@@ -82,6 +82,7 @@ public class TrackerPhysics : MonoBehaviour
             vertex.drag = c_drag;
             vertex.angularDrag = c_drag;
             vertex.useGravity = false;
+            vertex.mass = 0.1f;
 
             Tracker tracker = trackingSettings.Apply(vertex);
             tracker.StartTracking(selfRb);

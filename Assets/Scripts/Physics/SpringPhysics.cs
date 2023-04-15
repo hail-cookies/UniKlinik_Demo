@@ -34,7 +34,6 @@ public class SpringPhysics : MonoBehaviour
     }
 
     public Transform core;
-    public Rigidbody selfRB;
     public List<RBVertex> vertices = new List<RBVertex>();
     public List<RBEdge> edges;
 
@@ -54,7 +53,7 @@ public class SpringPhysics : MonoBehaviour
         }
     }
 
-    float c_drag = 0.9f;
+    float c_drag = 0f;
     //[Button("Create Vertices"), ShowIf("@vertices.Count == 0 && !UnityEngine.Application.isPlaying && core != null")]
     public void CreateVertices()
     {
@@ -65,7 +64,7 @@ public class SpringPhysics : MonoBehaviour
         for(int i = 0; i < core.childCount; i++)
         {
             Transform child = core.GetChild(i);
-            GameObject go = new GameObject("Vertex");
+            GameObject go = new GameObject(child.name);
             go.transform.SetParent(VertexParent, false);
             go.layer = LayerMask.NameToLayer("SoftBodies");
 
@@ -96,27 +95,22 @@ public class SpringPhysics : MonoBehaviour
             _centerRB.transform.position = transform.position;
             _centerRB.drag = c_drag;
             _centerRB.angularDrag = c_drag;
-            _centerRB.useGravity = false;
+            _centerRB.isKinematic = true;
             _centerRB.position = transform.position;
         }
-
-        if (!_centerRB.TryGetComponent<SpringJoint>(out var joint))
-            joint = CreateSpring(_centerRB, selfRB);
-        else
-            joint = ConfigureSpring(joint);
 
         for (int i = 0; i < vertices.Count; i++)
         {
             var vertex = vertices[i];
             edges.Add(new RBEdge(_centerRB, CreateSpring(_centerRB, vertex.rb)));
 
-            if(IsPolar(vertex.dir))
+            if (IsPolar(vertex.dir))
             {
-                for(int j = 0; j < vertices.Count; j++)
+                for (int j = 0; j < vertices.Count; j++)
                 {
                     var other = vertices[j];
-                    if(Vector3.Dot(vertex.dir, other.dir) > 0)
-                        if(vertex.rb != other.rb)
+                    if (Vector3.Dot(vertex.dir, other.dir) > 0)
+                        if (vertex.rb != other.rb)
                             edges.Add(new RBEdge(vertex.rb, CreateSpring(vertex.rb, other.rb)));
                 }
             }

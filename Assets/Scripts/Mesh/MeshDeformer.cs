@@ -22,8 +22,11 @@ public class MeshDeformer : MonoBehaviour
             displacedVertices[i] = originalVertices[i];
     }
 
+    float scale = 1;
     public void ApplyForce(Vector3 origin, float force, float dt)
     {
+        scale = transform.localScale.x;
+
         for (int i = 0; i < displacedVertices.Length; i++)
             ApplyForceToVertex(i, origin, force, dt);
     }
@@ -32,6 +35,8 @@ public class MeshDeformer : MonoBehaviour
     {
         origin = transform.InverseTransformPoint(origin);
         Vector3 delta = displacedVertices[vertex] - origin;
+        delta *= scale;
+
         float attenuatedForce = force / (1f + delta.sqrMagnitude);
         float velocity = attenuatedForce * dt;
         velocities[vertex] += delta.normalized * velocity;
@@ -51,9 +56,10 @@ public class MeshDeformer : MonoBehaviour
     {
         Vector3 v = velocities[vertex];
         Vector3 displacement = displacedVertices[vertex] - originalVertices[vertex];
+        displacement *= scale;
         v -= displacement * tension * dt;
         v *= 1f - damping * dt;
         velocities[vertex] = v;
-        displacedVertices[vertex] += v * dt;
+        displacedVertices[vertex] += v * (dt / scale);
     }
 }
