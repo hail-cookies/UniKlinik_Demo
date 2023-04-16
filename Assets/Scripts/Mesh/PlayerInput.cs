@@ -6,7 +6,7 @@ public class PlayerInput : MonoBehaviour
 {
     public float deformationForce = 10;
     public float deformationRadius = 0.6f;
-    public InputActionReference mouseLeft;
+    public InputActionReference mouseLeft, escape;
     public Transform cam;
 
     // Start is called before the first frame update
@@ -15,6 +15,14 @@ public class PlayerInput : MonoBehaviour
         mouseLeft.action.Enable();
         mouseLeft.action.performed += MouseLeft;
         mouseLeft.action.canceled += MouseLeft;
+
+        escape.action.Enable();
+        escape.action.performed += Exit;
+    }
+
+    private void Exit(InputAction.CallbackContext obj)
+    {
+        Application.Quit();
     }
 
     bool mouseDown = false;
